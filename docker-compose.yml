@@ -1,0 +1,38 @@
+services:
+  app:
+    container_name: app
+    build: 
+      context: ./app 
+      dockerfile: Dockerfile
+    networks:
+      - cassandra-tier 
+    volumes:
+      - ./app:/app:bind
+  
+  cassandra:
+    container_name: cassandra
+    build: 
+      context: ./cassandra 
+      dockerfile: Dockerfile
+    networks:
+      - cassandra-tier 
+    volumes:
+      - cassandra-data:/bitnami 
+      - ./cassandra/scripts:/mnt/cassandra/scripts
+    environment:
+      #Seeds
+      - CASSANDRA_SEEDS=cassandra
+      #Users and authorization
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_PASSWORD=cassandra
+    
+
+networks:
+  cassandra-tier:
+    driver: bridge 
+
+volumes:
+  cassandra-data:
+    driver: local
+  
